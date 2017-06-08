@@ -25,7 +25,7 @@ def get_args():
     parser.add_argument('-i', '--index', type=comma_separated,
                         help='A list of comma separated columns that will be used as the index for both CSVs')
 
-    parser.add_argument('-a', '--arrow', help='A string used to separate new and old CSVs', required=False)
+    parser.add_argument('-a', '--arrow', help='A string used to separate new and old CSVs', required=False, default='→')
     parser.add_argument('-o', '--output', help='A file to output to', required=False)
     return parser.parse_args()
 
@@ -41,7 +41,7 @@ def main():
         a = a.set_index(keys=args.index)
         b = b.set_index(keys=args.index)
 
-    result = a.pipe(difference, b)
+    result = a.pipe(difference, b, arrow=args.arrow)
 
     if args.output:
         result.to_csv(args.output)

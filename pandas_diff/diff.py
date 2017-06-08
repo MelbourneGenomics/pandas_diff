@@ -2,7 +2,7 @@ import pandas as pd
 from oset import oset
 
 
-def difference(self: pd.DataFrame, other: pd.DataFrame):
+def difference(self: pd.DataFrame, other: pd.DataFrame, arrow: str = '→'):
     # Find a set of all columns
     a_cols = oset(self.columns)
     b_cols = oset(other.columns)
@@ -27,7 +27,8 @@ def difference(self: pd.DataFrame, other: pd.DataFrame):
     # Now diff every pair of columns
     for column in columns:
         # First, make a series which shows a→b
-        diff = merged.a[column].fillna('').astype(str).str.cat(others=merged.b[column].fillna('').astype(str), sep='→')
+        diff = merged.a[column].fillna('').astype(str).str.cat(others=merged.b[column].fillna('').astype(str),
+                                                               sep=arrow)
 
         # Now use that series whenever the two series differ (and aren't NAN).
         result[column] = diff.where(
