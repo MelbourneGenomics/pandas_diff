@@ -2,7 +2,7 @@ import pandas as pd
 from oset import oset
 
 
-def difference(self: pd.DataFrame, other: pd.DataFrame, arrow: str = '→'):
+def difference(self: pd.DataFrame, other: pd.DataFrame, arrow: str = '→', missing_column="<missing column>", empty="<empty>"):
     # Find a set of all columns
     a_cols = oset(self.columns)
     b_cols = oset(other.columns)
@@ -16,7 +16,7 @@ def difference(self: pd.DataFrame, other: pd.DataFrame, arrow: str = '→'):
     for column in columns:
         for df in (a, b):
             if not column in df:
-                df[column] = ''
+                df[column] = missing_column
 
     # Join the two data frames and produce a multi-indexed data frame
     merged = pd.concat([self, other], keys=['a', 'b'], axis=1)
@@ -27,7 +27,7 @@ def difference(self: pd.DataFrame, other: pd.DataFrame, arrow: str = '→'):
     # Now diff every pair of columns
     for column in columns:
         # First, make a series which shows a→b
-        diff = merged.a[column].fillna('').astype(str).str.cat(others=merged.b[column].fillna('').astype(str),
+        diff = merged.a[column].fillna('').astype(str).str.cat(others=merged.b[column].fillna(empty).astype(str),
                                                                sep=arrow)
 
         # Now use that series whenever the two series differ (and aren't NAN).
