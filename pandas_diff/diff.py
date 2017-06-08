@@ -38,6 +38,9 @@ def difference(self: pd.DataFrame, other: pd.DataFrame):
     # Now filter out any row that is all NAN
     result = result[result.notnull().any(axis=1)]
 
+    # Then filter out any column that is all NAN
+    result = result.loc[:, result.notnull().any(axis=0)]
+
     return result
 
 
