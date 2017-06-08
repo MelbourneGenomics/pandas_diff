@@ -9,7 +9,7 @@ def existing_path(input: str):
     if path.exists():
         return path
     else:
-        raise argparse.ArgumentTypeError('"{input}" is not a valid path and existing path'.format(input))
+        raise argparse.ArgumentTypeError('"{}" is not a valid path and existing path'.format(input))
 
 
 def comma_separated(input: str):
@@ -19,7 +19,7 @@ def get_args():
     parser = argparse.ArgumentParser(description='Diffs two CSV files by joining on their index')
     for csv in ('a', 'b'):
         # The positional argument for the CSV itself
-        parser.add_argument(csv, type=argparse.FileType(), help='Input CSV {csv}'.format(csv))
+        parser.add_argument(csv, type=argparse.FileType(), help='Input CSV {}'.format(csv))
 
     parser.add_argument('-d', '--delim', help='The field to use as a delimiter for csvs', default=',', required=False)
     parser.add_argument('-i', '--index', type=comma_separated,
