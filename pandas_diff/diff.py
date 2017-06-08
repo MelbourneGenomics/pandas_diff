@@ -27,7 +27,7 @@ def difference(self: pd.DataFrame, other: pd.DataFrame):
     # Now diff every pair of columns
     for column in columns:
         # First, make a series which shows a→b
-        diff = merged.a[column].astype(str).str.cat(others=merged.b[column].astype(str), sep='→')
+        diff = merged.a[column].fillna('').astype(str).str.cat(others=merged.b[column].fillna('').astype(str), sep='→')
 
         # Now use that series whenever the two series differ (and aren't NAN).
         result[column] = diff.where(

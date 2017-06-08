@@ -6,7 +6,7 @@ from pandas_diff.diff import difference
 class Tests(unittest.TestCase):
     def test_basic(self):
         a = pd.DataFrame(dict(
-            one=["Lorem", "ipsum", "dolor", 'sit', 'amet', 'consectetur', 'adipiscing', 'elit'],
+            one=["Lorem", "ipsum", "dolor", 'sit', 'amet', 'consectetur', 'adipiscing', ''],
             two=[1, 3, 5, 7, 9, 11, 13, 15]
         ))
 
@@ -16,7 +16,7 @@ class Tests(unittest.TestCase):
         ))
 
         diff = a.pipe(difference, b)
-        self.assertEqual(len(diff), 3)
+        self.assertEqual(len(diff), 4)
 
     def test_index(self):
         a = pd.DataFrame(dict(
