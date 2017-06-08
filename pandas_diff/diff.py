@@ -41,7 +41,7 @@ def diff_series(a: pd.Series, b: pd.Series):
         if item_a == item_b:
             out[index] = ''
         else:
-            out[index] = f'{item_a} → {item_b}'
+            out[index] = '{item_a} → {item_b}'.format(item_a=item_a, item_b=item_b)
 
         # out[index] = list([diff for diff in difflib.ndiff([item_a], [item_b]) if not diff.startswith(' ')])
     return out
