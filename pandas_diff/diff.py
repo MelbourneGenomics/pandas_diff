@@ -26,11 +26,17 @@ def difference(self: pd.DataFrame, other: pd.DataFrame):
 
     # Now diff every pair of columns
     for column in columns:
+        # First, make a series which shows a→b
         diff = merged.a[column].astype(str).str.cat(others=merged.b[column].astype(str), sep='→')
+
+        # Now use that series whenever the two series differ (and aren't NAN).
         result[column] = diff.where(
-            cond=merged.a[column] != merged.b[column],
-            other=''
+            cond=(merged.a[column] != merged.b[column]) & ~ (pd.isnull(merged.a[column]) & pd.isnull(merged.b[column])),
+            other=pd.np.nan
         )
+
+    # Now filter out any row that is all NAN
+    result = result[result.notnull().any(axis=1)]
 
     return result
 
@@ -43,6 +49,5 @@ def diff_series(a: pd.Series, b: pd.Series):
         else:
             out[index] = '{} → {}'.format(item_a, item_b)
 
-        # out[index] = list([diff for diff in difflib.ndiff([item_a], [item_b]) if not diff.startswith(' ')])
+            # out[index] = list([diff for diff in difflib.ndiff([item_a], [item_b]) if not diff.startswith(' ')])
     return out
-
