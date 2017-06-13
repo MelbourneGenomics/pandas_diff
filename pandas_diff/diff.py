@@ -2,15 +2,37 @@ import pandas as pd
 from oset import oset
 
 
-def difference(self: pd.DataFrame, other: pd.DataFrame, arrow: str = '→', missing_column="<missing column>", empty="<empty>"):
+def difference(df_a: pd.DataFrame,
+               df_b: pd.DataFrame,
+               arrow: str = '→',
+               missing_column="<missing column>",
+               empty="<empty>",
+               show_empty_cols=True,
+               show_empty_rows=True) -> pd.DataFrame:
+    """
+    Diffs two data frames by joining them on their indices and returning a DataFrame with cells that show how the two differ
+
+    :param df_a: The initial/first DataFrame, the one that we consider the second as diverging from
+    :param df_b: The second DataFrame, one which we consider as diverging from df_a
+    :param arrow: The character used to indicate a change in value, e.g. "initial value" + arrow + "final value"
+    :param missing_column: The string value used to indicate a column that has been inserted or deleted
+    :param empty: The string value used to indicate an empty cell
+    :param show_empty_cols: True if every column of the input DataFrames should be printed, even if they are identical
+        between DataFrames. Otherwise, ignore such columns
+    :param show_empty_rows: True if every row of the input DataFrames should be printed, even if they are identical
+        between DataFrames. Otherwise, ignore such rows
+    :return: A DataFrame, with the same columns as the input DataFrames, but with each cell showing how the two input
+        DataFrames differed.
+    """
+
     # Find a set of all columns
-    a_cols = oset(self.columns)
-    b_cols = oset(other.columns)
+    a_cols = oset(df_a.columns)
+    b_cols = oset(df_b.columns)
     columns = a_cols | b_cols
 
     # We'll use a and b as the DFs
-    a = self
-    b = other
+    a = df_a
+    b = df_b
 
     # Ensure all DFs have the same columns for better diffing
     for column in columns:
@@ -27,8 +49,8 @@ def difference(self: pd.DataFrame, other: pd.DataFrame, arrow: str = '→', miss
     # Now diff every pair of columns
     for column in columns:
         # First, make a series which shows a→b
-        diff = merged.a[column].fillna('').astype(str).str.cat(others=merged.b[column].fillna(empty).astype(str),
-                                                               sep=arrow)
+        diff = merged.a[column].fillna(empty).astype(str).str.cat(others=merged.b[column].fillna(empty).astype(str),
+                                                                  sep=arrow)
 
         # Now use that series whenever the two series differ (and aren't NAN).
         result[column] = diff.where(
@@ -37,21 +59,11 @@ def difference(self: pd.DataFrame, other: pd.DataFrame, arrow: str = '→', miss
         )
 
     # Now filter out any row that is all NAN
-    result = result[result.notnull().any(axis=1)]
+    if not show_empty_rows:
+        result = result[result.notnull().any(axis=1)]
 
     # Then filter out any column that is all NAN
-    result = result.loc[:, result.notnull().any(axis=0)]
+    if not show_empty_cols:
+        result = result.loc[:, result.notnull().any(axis=0)]
 
     return result
-
-
-def diff_series(a: pd.Series, b: pd.Series):
-    out = a.copy().astype(object)
-    for (index, item_a), item_b in zip(a.astype(str).iteritems(), b.astype(str)):
-        if item_a == item_b:
-            out[index] = ''
-        else:
-            out[index] = '{} → {}'.format(item_a, item_b)
-
-            # out[index] = list([diff for diff in difflib.ndiff([item_a], [item_b]) if not diff.startswith(' ')])
-    return out
