@@ -1,0 +1,5 @@
+.
+setuptools>=36
+sphinx
+git+https://github.com/TMiguelT/sphinxcontrib-restbuilder
+sphinx-argparse
