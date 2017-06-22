@@ -39,6 +39,7 @@ def get_parser():
     parser.add_argument('-l', '--deletion',
                         help='A string used to indicate a value when the column is deleted. Defaults to "<nocol>".',
                         required=False, default='<nocol>')
+    parser.add_argument('-o', '--output', help='A file to output to', required=False)
     parser.add_argument('-r', '--rename',
                         help='A series of comma separated strings of the form "original:renamed", where original is the'
                              'name of the column in CSV a, and renamed is the new name of the column in CSV b',
