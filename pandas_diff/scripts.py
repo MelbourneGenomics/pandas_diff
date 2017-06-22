@@ -68,7 +68,7 @@ def main():
         b = b.set_index(keys=args.index)
 
     result = a.pipe(difference, b, arrow=args.arrow, empty=args.empty, missing_column=args.deletion,
-                    hide_empty_cols=args.no_hide_cols, hide_empty_rows=args.no_hide_rows, renamed=args.renamed)
+                    hide_empty_cols=args.no_hide_cols, hide_empty_rows=args.no_hide_rows, renamed=args.rename)
 
     if args.output:
         result.to_csv(args.output, na_rep='', index=not args.hide_index)
