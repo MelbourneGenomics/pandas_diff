@@ -52,6 +52,10 @@ def get_parser():
     parser.add_argument('--hide-index', help="Don't print the index rows (specified with --index) in the output",
                         action='store_true',
                         default=False, required=False)
+    parser.add_argument('-s', '--same',
+                        help="Set a value for cells that are the same between both data frames. Set to 'value' to see the "
+                             "original value. Otherwise defaults to an empty string.",
+                        default='', required=False)
     return parser
 
 
@@ -69,7 +73,8 @@ def main():
         b = b.set_index(keys=args.index)
 
     result = a.pipe(difference, b, arrow=args.arrow, empty=args.empty, missing_column=args.deletion,
-                    show_empty_cols=args.no_hide_cols, show_empty_rows=args.no_hide_rows, renamed=args.rename)
+                    show_empty_cols=args.no_hide_cols, show_empty_rows=args.no_hide_rows, renamed=args.rename,
+                    same=args.same)
 
     if args.output:
         result.to_csv(args.output, na_rep='', index=not args.hide_index)

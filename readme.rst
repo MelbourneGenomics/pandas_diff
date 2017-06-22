@@ -21,7 +21,8 @@ Diffs two CSV files by joining on their index
 ::
 
    usage: pdiff [-h] [-d DELIM] [-i INDEX] [-a ARROW] [-e EMPTY] [-l DELETION]
-                [-r RENAME] [--no-hide-cols] [--no-hide-rows] [--hide-index]
+                [-o OUTPUT] [-r RENAME] [--no-hide-cols] [--no-hide-rows]
+                [--hide-index] [-s SAME]
                 a b
 
 
@@ -72,6 +73,10 @@ to “<nocol>”.
 
 Default: “<nocol>”
 
+-o, --output
+
+A file to output to
+
 -r, --rename
 
 A series of comma separated strings of the form “original:renamed”,
@@ -95,6 +100,14 @@ Default: False
 Don’t print the index rows (specified with –index) in the output
 
 Default: False
+
+-s, --same
+
+Set a value for cells that are the same between both data frames. Set
+to ‘value’ to see the original value. Otherwise defaults to an empty
+string.
+
+Default: “”
 
 
 Python Interface
@@ -126,7 +139,7 @@ The full API of the ``difference`` function is as follows:
 
 **pandas_diff.diff.difference(df_a: pandas.core.frame.DataFrame, df_b:
 pandas.core.frame.DataFrame, arrow: str = ‘→’,
-missing_column=’<missing column>’, empty=’<empty>’,
+missing_column=’<missing column>’, empty=’<empty>’, same=”,
 show_empty_cols=False, show_empty_rows=False, renamed={}) ->
 pandas.core.frame.DataFrame**
 
@@ -151,6 +164,11 @@ pandas.core.frame.DataFrame**
       * **show_empty_cols** – True if every column of the input
          DataFrames should be printed, even if they are identical
          between DataFrames. Otherwise, ignore such columns
+
+      * **same** – What value to show when two cells have the same
+         value. Defaults to ”, an empty string. Can also be any
+         arbitrary string, or, if it’s the string ‘value’, instead
+         just show what that value is.
 
       * **show_empty_rows** – True if every row of the input
          DataFrames should be printed, even if they are identical

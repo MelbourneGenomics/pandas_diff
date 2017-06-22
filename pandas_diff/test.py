@@ -25,6 +25,10 @@ class Tests(unittest.TestCase):
         self.assertEqual(diff.shape, (4, 2))
 
     def test_index(self):
+        """
+        Tests when we're relying on the index to join the two DFs
+        :return:
+        """
         a = pd.DataFrame(dict(
             one=["Lorem", "ipsum", "dolor", 'sit', 'amet', 'consectetur', 'adipiscing', 'elit'],
             two=[1, 3, 5, 7, 9, 11, 13, 15]
@@ -40,7 +44,7 @@ class Tests(unittest.TestCase):
 
     def test_rename(self):
         """
-        Tests the renamed parameter to difference
+        Tests the 'renamed' parameter to difference
         """
         a = pd.DataFrame({
             'one': [1, 2, 3, 4, 5],
@@ -61,3 +65,15 @@ class Tests(unittest.TestCase):
         """
         parsed = comma_dictionary('one:uno,two:dos')
         self.assertEqual(parsed, {'one': 'uno', 'two': 'dos'})
+
+    def test_value_override(self):
+        """
+        Tests the same='value' parameter to the difference function
+        """
+
+        a = pd.DataFrame({
+            'one': [1, 2, 3, 4, 5],
+        })
+
+        diff = a.pipe(difference, a, same='value', show_empty_rows=True, show_empty_cols=True)
+        self.assertTrue((diff == a).all()[0])

@@ -7,6 +7,7 @@ def difference(df_a: pd.DataFrame,
                arrow: str = '→',
                missing_column="<missing column>",
                empty="<empty>",
+               same='',
                show_empty_cols=False,
                show_empty_rows=False,
                renamed={}
@@ -21,6 +22,8 @@ def difference(df_a: pd.DataFrame,
     :param empty: The string value used to indicate an empty cell
     :param show_empty_cols: True if every column of the input DataFrames should be printed, even if they are identical
         between DataFrames. Otherwise, ignore such columns
+    :param same: What value to show when two cells have the same value. Defaults to '', an empty string. Can also be
+        any arbitrary string, or, if it's the string 'value', instead just show what that value is.
     :param show_empty_rows: True if every row of the input DataFrames should be printed, even if they are identical
         between DataFrames. Otherwise, ignore such rows
     :param renamed: A dictionary showing how columns have been renamed from df_a to df_b. These renamed columns will then
@@ -50,22 +53,23 @@ def difference(df_a: pd.DataFrame,
                 df[column] = missing_column
 
     # Join the two data frames and produce a multi-indexed data frame
-    merged = pd.concat([a, b], keys=['a', 'b'], axis=1)
+    merged = pd.concat([a, b], keys=['a', 'b'], join='inner', axis=1)
 
-    # Create the output DF
-    result = pd.DataFrame(index=a.index)
+    # Group the merged data
+    groups = merged.groupby(level=1, axis=1)
 
-    # Now diff every pair of columns
-    for column in columns:
-        # First, make a series which shows a→b
-        diff = merged.a[column].fillna(empty).astype(str).str.cat(others=merged.b[column].fillna(empty).astype(str),
-                                                                  sep=arrow)
+    # A DF showing the diff values (A->B) in each cell
+    diff = groups.apply(lambda group:
+                        group.iloc[:, 0].fillna(empty).astype(str).str.cat(
+                            others=group.iloc[:, 1].fillna(empty).astype(str),
+                            sep=arrow)
+                        )
 
-        # Now use that series whenever the two series differ (and aren't NAN).
-        result[column] = diff.where(
-            cond=(merged.a[column] != merged.b[column]) & ~ (pd.isnull(merged.a[column]) & pd.isnull(merged.b[column])),
-            other=pd.np.nan
-        )
+    # A df with cells that are True where the two cells are different and False otherwise
+    mask = groups.apply(lambda group: group.iloc[:, 0] != group.iloc[:, 1])
+
+    # The output is A->B if they're different, otherwise NAN
+    result = diff.where(cond=mask, other=pd.np.nan)
 
     # Now filter out any row that is all NAN
     if not show_empty_rows:
@@ -74,5 +78,12 @@ def difference(df_a: pd.DataFrame,
     # Then filter out any column that is all NAN
     if not show_empty_cols:
         result = result.loc[:, result.notnull().any(axis=0)]
+
+    if same == 'value':
+        # If the user wants to see the values of the cells that are the same, take them from DF a
+        result = result.fillna(a)
+    else:
+        # Otherwise, just fill those cells with the provided values
+        result = result.fillna(same)
 
     return result
