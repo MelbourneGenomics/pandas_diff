@@ -1,6 +1,7 @@
 import unittest
 import pandas as pd
 from pandas_diff.diff import difference
+from pandas_diff.scripts import comma_dictionary
 
 
 class Tests(unittest.TestCase):
@@ -38,6 +39,9 @@ class Tests(unittest.TestCase):
         self.assertEqual(len(diff), 3)
 
     def test_rename(self):
+        """
+        Tests the renamed parameter to difference
+        """
         a = pd.DataFrame({
             'one': [1, 2, 3, 4, 5],
             'two': [6, 7, 8, 9, 19],
@@ -50,3 +54,10 @@ class Tests(unittest.TestCase):
 
         diff = a.pipe(difference, b, renamed={'one': 'uno', 'two': 'dos'})
         self.assertEqual(len(diff), 0)
+
+    def test_dict_type(self):
+        """
+        Tests the comma_dictionary argument type
+        """
+        parsed = comma_dictionary('one:uno,two:dos')
+        self.assertEqual(parsed, {'one': 'uno', 'two': 'dos'})

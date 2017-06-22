@@ -17,7 +17,8 @@ def comma_separated(input: str):
 
 
 def comma_dictionary(input: str):
-    return {key: value for column in input.split(',') for key, value in column.split(':')}
+    split = [col.split(':') for col in input.split(',')]
+    return {key: value for key, value in split}
 
 
 def get_parser():
