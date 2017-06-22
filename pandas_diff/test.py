@@ -37,3 +37,16 @@ class Tests(unittest.TestCase):
         diff = a.pipe(difference, b)
         self.assertEqual(len(diff), 3)
 
+    def test_rename(self):
+        a = pd.DataFrame({
+            'one': [1, 2, 3, 4, 5],
+            'two': [6, 7, 8, 9, 19],
+        })
+
+        b = pd.DataFrame({
+            'uno': [1, 2, 3, 4, 5],
+            'dos': [6, 7, 8, 9, 19],
+        })
+
+        diff = a.pipe(difference, b, renamed={'one': 'uno', 'two': 'dos'})
+        self.assertEqual(len(diff), 0)

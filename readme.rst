@@ -2,8 +2,6 @@
 Pandas Diff
 ***********
 
-Contents:
-
 
 Installation
 ============
@@ -23,7 +21,7 @@ Diffs two CSV files by joining on their index
 ::
 
    usage: pdiff [-h] [-d DELIM] [-i INDEX] [-a ARROW] [-e EMPTY] [-l DELETION]
-                [--no-hide-cols] [--no-hide-rows] [--hide-index]
+                [-r RENAME] [--no-hide-cols] [--no-hide-rows] [--hide-index]
                 a b
 
 
@@ -74,6 +72,12 @@ to “<nocol>”.
 
 Default: “<nocol>”
 
+-r, --rename
+
+A series of comma separated strings of the form “original:renamed”,
+where original is thename of the column in CSV a, and renamed is the
+new name of the column in CSV b
+
 --no-hide-cols
 
 Show columns that have no changes in them
@@ -123,7 +127,7 @@ The full API of the ``difference`` function is as follows:
 **pandas_diff.diff.difference(df_a: pandas.core.frame.DataFrame, df_b:
 pandas.core.frame.DataFrame, arrow: str = ‘→’,
 missing_column=’<missing column>’, empty=’<empty>’,
-show_empty_cols=True, show_empty_rows=True) ->
+show_empty_cols=False, show_empty_rows=False, renamed={}) ->
 pandas.core.frame.DataFrame**
 
    Diffs two data frames by joining them on their indices and
@@ -151,6 +155,12 @@ pandas.core.frame.DataFrame**
       * **show_empty_rows** – True if every row of the input
          DataFrames should be printed, even if they are identical
          between DataFrames. Otherwise, ignore such rows
+
+      * **renamed** – A dictionary showing how columns have been
+         renamed from df_a to df_b. These renamed columns will then
+         mapped with each other for the diff. The keys of this
+         dictionary should be the column names in df_a, and the values
+         should be the column names in df_b
 
    :Returns:
       A DataFrame, with the same columns as the input DataFrames, but

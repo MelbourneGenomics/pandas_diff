@@ -16,6 +16,10 @@ def comma_separated(input: str):
     return input.split(',')
 
 
+def comma_dictionary(input: str):
+    return {key: value for column in input.split(',') for key, value in column.split(':')}
+
+
 def get_parser():
     parser = argparse.ArgumentParser(description='Diffs two CSV files by joining on their index')
     for csv in ('a', 'b'):
@@ -35,11 +39,16 @@ def get_parser():
     parser.add_argument('-l', '--deletion',
                         help='A string used to indicate a value when the column is deleted. Defaults to "<nocol>".',
                         required=False, default='<nocol>')
+    parser.add_argument('-r', '--rename',
+                        help='A series of comma separated strings of the form "original:renamed", where original is the'
+                             'name of the column in CSV a, and renamed is the new name of the column in CSV b',
+                        required=False, type=comma_dictionary)
     parser.add_argument('--no-hide-cols', help="Show columns that have no changes in them", action='store_true',
                         default=False, required=False)
     parser.add_argument('--no-hide-rows', help="Show rows that have no changes in them", action='store_true',
                         default=False, required=False)
-    parser.add_argument('--hide-index', help="Don't print the index rows (specified with --index) in the output", action='store_true',
+    parser.add_argument('--hide-index', help="Don't print the index rows (specified with --index) in the output",
+                        action='store_true',
                         default=False, required=False)
     return parser
 
@@ -58,7 +67,7 @@ def main():
         b = b.set_index(keys=args.index)
 
     result = a.pipe(difference, b, arrow=args.arrow, empty=args.empty, missing_column=args.deletion,
-                    hide_empty_cols=args.no_hide_cols, hide_empty_rows=args.no_hide_rows)
+                    hide_empty_cols=args.no_hide_cols, hide_empty_rows=args.no_hide_rows, renamed=args.renamed)
 
     if args.output:
         result.to_csv(args.output, na_rep='', index=not args.hide_index)
